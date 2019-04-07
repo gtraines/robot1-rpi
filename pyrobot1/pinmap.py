@@ -1,4 +1,6 @@
 from collections import namedtuple
+from itertools import chain
+
 
 class RowNames:
     OUTER="outer"
@@ -18,9 +20,23 @@ Row = namedtuple("Row", field_names="row_name, pins")
 Column = namedtuple("Column", field_names="column_num, outer_pin, inner_pin")
 
 class RPi3Pins:
+    
     def __init__(self):
         pass
 
+    @staticmethod
+    def get_pins_by_type(pin_type):
+        query_results = []
+
+        for entry in chain.from_iterable([
+            RPi3Pins.outer_row().pins,
+            RPi3Pins.inner_row().pins
+            ]):
+            if entry.pin_type == pin_type:
+                query_results.append(entry)
+
+        return query_results
+    
     @staticmethod
     def outer_row(): 
         return Row(row_name=RowNames.OUTER, pins=[
@@ -146,7 +162,9 @@ class RPi3Pins:
         )
     ])
 
-    inner_row = Row(row_name=RowNames.INNER, pins=[
+    @staticmethod
+    def inner_row():
+        return Row(row_name=RowNames.INNER, pins=[
         Pin(
             coords=PinCoords(row_name=RowNames.INNER, pin_pair_num=0),
             id=None,
