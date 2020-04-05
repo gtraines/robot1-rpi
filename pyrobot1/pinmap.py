@@ -14,10 +14,10 @@ class PinTypes:
     I2C="i2c"
     EEPROM="EEPROM"
 
-Pin = namedtuple("Pin", field_names="coords, id, pin_type, special_func")
-PinCoords = namedtuple("PinCoords", field_names="row_name, pin_pair_num")
-Row = namedtuple("Row", field_names="row_name, pins")
-Column = namedtuple("Column", field_names="column_num, outer_pin, inner_pin")
+Pin = namedtuple("Pin", "coords, id, pin_type, special_func")
+PinCoords = namedtuple("PinCoords", "row_name, pin_pair_num")
+Row = namedtuple("Row", "row_name, pins")
+Column = namedtuple("Column", "column_num, outer_pin, inner_pin")
 
 class RPi3Pins:
     
@@ -36,6 +36,15 @@ class RPi3Pins:
                 query_results.append(entry)
 
         return query_results
+    
+    @staticmethod
+    def get_pin_at(inner_or_outer, pair_index):
+        if inner_or_outer == RowNames.OUTER:
+            return RPi3Pins.outer_row().pins[pair_index]
+        
+        if inner_or_outer == RowNames.INNER:
+            return RPi3Pins.inner_row().pins[pair_index]
+            
     
     @staticmethod
     def outer_row(): 
@@ -287,3 +296,28 @@ class RPi3Pins:
         )
     ])
 
+def print_pins():
+    rpi_pins = RPi3Pins()
+    
+    longwise_pins = zip(rpi_pins.inner_row().pins, rpi_pins.outer_row().pins)
+    
+    print(' Power light ^^ ')
+    
+    def pin_as_string(pin):
+        pin_id = str(pin.id)
+        special_func = ']\t\t\t'
+        if pin.special_func is not None:
+            special_func = '(' + pin.special_func + ')]\t\t'
+        
+        return '[' + pin_id + ': ' + pin.pin_type + special_func
+    
+    for echelon in longwise_pins:
+        print(echelon[0].coords.pin_pair_num, '\t',
+              pin_as_string(echelon[0]),
+              pin_as_string(echelon[1]))
+    print()
+    print(' USB Connectors ') 
+
+if __name__ == '__main__':
+    print_pins()
+    

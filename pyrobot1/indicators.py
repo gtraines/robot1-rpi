@@ -35,7 +35,7 @@ class Indicator:
             self.turn_off()
             time.sleep(0.25)
         self.turn_off()
-    
+
 
 def get_available_gpio_pins():
     gpio_pins = RPi3Pins.get_pins_by_type(PinTypes.GPIO)
@@ -61,11 +61,11 @@ def main():
         print(pin.id, pin.coords)
 
 
-def blink_some_indicators():
+def blink_some_indicators(high_is_on=True):
     for pin in get_available_gpio_pins():
         if pin.coords.pin_pair_num > 15:
             print(pin.id, pin.coords)
-            led = Indicator(pin, False)
+            led = Indicator(pin, high_is_on)
             led.blink_times(5)
 
 if __name__ == '__main__':
